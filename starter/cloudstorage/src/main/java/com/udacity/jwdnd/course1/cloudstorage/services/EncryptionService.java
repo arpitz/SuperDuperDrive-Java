@@ -32,12 +32,12 @@ public class EncryptionService {
         return Base64.getEncoder().encodeToString(encryptedValue);
     }
 
-    public String decryptValue(String data, String key) {
+    public String decryptValue(String data, byte[] key) {
         byte[] decryptedValue = null;
 
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            SecretKey secretKey = new SecretKeySpec(key.getBytes(), "AES");
+            SecretKey secretKey = new SecretKeySpec(key, "AES");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             decryptedValue = cipher.doFinal(Base64.getDecoder().decode(data));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
