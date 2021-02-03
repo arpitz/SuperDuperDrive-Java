@@ -2,6 +2,8 @@ package com.udacity.jwdnd.course1.cloudstorage.controller;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
+import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +16,11 @@ import java.security.spec.InvalidKeySpecException;
 public class CredentialController {
 
     private CredentialService credentialService;
+    private EncryptionService encryptionService;
 
-    public CredentialController(CredentialService credentialService) {
+    public CredentialController(CredentialService credentialService, EncryptionService encryptionService) {
         this.credentialService = credentialService;
+        this.encryptionService = encryptionService;
     }
 
     @PostMapping("/credential")
@@ -39,4 +43,11 @@ public class CredentialController {
         model.addAttribute("setTab", "CredentialTab");
         return "home";
     }
+
+//    @GetMapping("/decryptPassword/{id}")
+//    public ResponseEntity<String> decryptPassword(@PathVariable("id") long id, Model model){
+//        Credential cred = credentialService.getCredential(id);
+//        String decrypted = encryptionService.decryptValue(cred.getPassword(), cred.getKey());
+//        return ResponseEntity.ok(decrypted);
+//    }
 }

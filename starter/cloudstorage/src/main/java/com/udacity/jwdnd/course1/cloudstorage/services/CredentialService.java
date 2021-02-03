@@ -40,6 +40,19 @@ public class CredentialService {
     }
 
     public void updateCredential(Credential credential){
-        credentialMapper.updateCredential(credential);
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+
+        credential.setKey(salt);
+        String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), credential.getKey());
+
+        credentialMapper.updateCredential(new Credential(credential.getCredentialid(),
+                credential.getUrl(), credential.getUsername(), credential.getKey(),
+                encryptedPassword,credential.getUserid()));
+    }
+
+    public Credential getCredential(long credentialid){
+        return credentialMapper.getCredential(credentialid);
     }
 }
