@@ -6,12 +6,11 @@ import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/home")
@@ -33,12 +32,16 @@ public class HomeController {
     @GetMapping()
     public String homeView(@ModelAttribute("noteForm") Note noteForm,
                            @ModelAttribute("credentialForm") Credential credentialForm,
-                           @ModelAttribute("fileForm") Note fileForm, Model model){
+                           @ModelAttribute("fileForm") Note fileForm,
+                           @ModelAttribute("setTab") String setTab,
+                           Model model,
+                           Principal principal){
         model.addAttribute("notes", noteService.getAllNotes());
         model.addAttribute("credentials", credentialService.getAllCredentials());
         model.addAttribute("files", fileService.getAllFiles());
         model.addAttribute("encryptionService", encryptionService);
-        // model.addAttribute("setTab", "NoteTab");
+        model.addAttribute("setTab", setTab);
+        System.out.println(principal.getName());
         return "home";
     }
 }

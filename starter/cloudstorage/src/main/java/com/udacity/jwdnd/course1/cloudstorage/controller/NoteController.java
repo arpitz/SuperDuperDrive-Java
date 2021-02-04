@@ -5,6 +5,7 @@ import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping()
@@ -17,7 +18,8 @@ public class NoteController {
     }
 
     @PostMapping("/note")
-    public String saveNote(@ModelAttribute("noteForm") Note noteForm, Model model){
+    public String saveNote(@ModelAttribute("noteForm") Note noteForm, Model model,
+                           RedirectAttributes redirectAttributes){
         // If a note exists with that id, update it
         if(noteForm.getNoteid() != null){
             noteService.updateNote(noteForm);
@@ -25,15 +27,16 @@ public class NoteController {
             noteService.insertNote(noteForm);
         }
         model.addAttribute("notes", noteService.getAllNotes());
-        model.addAttribute("setTab", "NoteTab");
-        return "home";
+        redirectAttributes.addFlashAttribute("setTab", "NoteTab");
+        return "redirect:/home";
     }
 
     @GetMapping("/deleteNote/{id}")
-    public String deleteNote(@PathVariable("id") long id, Model model){
+    public String deleteNote(@PathVariable("id") long id, Model model,
+                             RedirectAttributes redirectAttributes){
         noteService.deleteNote(id);
         model.addAttribute("notes", noteService.getAllNotes());
-        model.addAttribute("setTab", "NoteTab");
-        return "home";
+        redirectAttributes.addFlashAttribute("setTab", "NoteTab");
+        return "redirect:/home";
     }
 }

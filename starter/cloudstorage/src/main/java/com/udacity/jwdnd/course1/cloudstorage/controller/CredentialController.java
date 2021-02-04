@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -24,7 +25,8 @@ public class CredentialController {
     }
 
     @PostMapping("/credential")
-    public String saveCredential(@ModelAttribute("credentialForm") Credential credentialForm, Model model) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public String saveCredential(@ModelAttribute("credentialForm") Credential credentialForm, Model model,
+                                 RedirectAttributes redirectAttributes) throws NoSuchAlgorithmException, InvalidKeySpecException {
         // If a credential exists with that id, update it
         if(credentialForm.getCredentialid() != null){
             credentialService.updateCredential(credentialForm);
@@ -32,22 +34,16 @@ public class CredentialController {
             credentialService.insertCredential(credentialForm);
         }
         model.addAttribute("credentials", credentialService.getAllCredentials());
-        model.addAttribute("setTab", "CredentialTab");
-        return "home";
+        redirectAttributes.addFlashAttribute("setTab", "CredentialTab");
+        return "redirect:/home";
     }
 
     @GetMapping("/deleteCredential/{id}")
-    public String deleteCredential(@PathVariable("id") long id, Model model){
+    public String deleteCredential(@PathVariable("id") long id, Model model,
+                                   RedirectAttributes redirectAttributes){
         credentialService.deleteCredential(id);
         model.addAttribute("credentials", credentialService.getAllCredentials());
-        model.addAttribute("setTab", "CredentialTab");
-        return "home";
+        redirectAttributes.addFlashAttribute("setTab", "CredentialTab");
+        return "redirect:/home";
     }
-
-//    @GetMapping("/decryptPassword/{id}")
-//    public ResponseEntity<String> decryptPassword(@PathVariable("id") long id, Model model){
-//        Credential cred = credentialService.getCredential(id);
-//        String decrypted = encryptionService.decryptValue(cred.getPassword(), cred.getKey());
-//        return ResponseEntity.ok(decrypted);
-//    }
 }

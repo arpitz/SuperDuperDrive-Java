@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
@@ -20,7 +21,8 @@ public class FileController {
     }
 
     @PostMapping("/fileUpload")
-    public String saveFile(@RequestParam("fileUpload") MultipartFile file, Model model) throws IOException {
+    public String saveFile(@RequestParam("fileUpload") MultipartFile file, Model model,
+                           RedirectAttributes redirectAttributes) throws IOException {
         File newFile = new File(
                 null,
                 file.getOriginalFilename(),
@@ -32,24 +34,26 @@ public class FileController {
 
         fileService.insertFile(newFile);
         model.addAttribute("files", fileService.getAllFiles());
-        model.addAttribute("setTab", "FileTab");
-        return "home";
+        redirectAttributes.addFlashAttribute("setTab", "FileTab");
+        return "redirect:/home";
     }
 
     @GetMapping("/download/{id}")
-    public String downloadFile(@PathVariable("id") long id, Model model) throws IOException {
+    public String downloadFile(@PathVariable("id") long id, Model model,
+                               RedirectAttributes redirectAttributes) throws IOException {
         File newFile = fileService.getFileById(id);
         java.io.File outputFile = new java.io.File(newFile.getFilename());
         FileUtils.writeByteArrayToFile(outputFile, newFile.getFiledata());
-        model.addAttribute("setTab", "FileTab");
-        return "home";
+        redirectAttributes.addFlashAttribute("setTab", "FileTab");
+        return "redirect:/home";
     }
 
     @GetMapping("/deleteFile/{id}")
-    public String deleteFile(@PathVariable("id") long id, Model model){
+    public String deleteFile(@PathVariable("id") long id, Model model,
+                             RedirectAttributes redirectAttributes){
         fileService.deleteFile(id);
         model.addAttribute("files", fileService.getAllFiles());
-        model.addAttribute("setTab", "FileTab");
-        return "home";
+        redirectAttributes.addFlashAttribute("setTab", "FileTab");
+        return "redirect:/home";
     }
 }

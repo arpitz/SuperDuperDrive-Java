@@ -39,13 +39,9 @@ public class CredentialService {
         credentialMapper.deleteCredential(credentialid);
     }
 
-    public void updateCredential(Credential credential){
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-
-        credential.setKey(salt);
-        String encryptedPassword = encryptionService.encryptValue(credential.getPassword(), credential.getKey());
+    public void updateCredential(Credential cred){
+        Credential credential = getCredential(cred.getCredentialid());
+        String encryptedPassword = encryptionService.encryptValue(cred.getPassword(), credential.getKey());
 
         credentialMapper.updateCredential(new Credential(credential.getCredentialid(),
                 credential.getUrl(), credential.getUsername(), credential.getKey(),

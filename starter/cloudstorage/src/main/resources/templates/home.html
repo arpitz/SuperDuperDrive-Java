@@ -20,7 +20,9 @@
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <a id="nav-files-tab" data-toggle="tab" href="#nav-files" role="tab"
                    aria-controls="nav-files" aria-selected="true"
-                   th:class="'nav-item nav-link '+ ${(setTab == 'FileTab' || setTab == null) ? 'active' : ''}">Files</a>
+                   th:class="'nav-item nav-link '+ ${(setTab == 'FileTab' || setTab == '') ? 'active' : ''}">
+                    Files
+                </a>
                 <a id="nav-notes-tab" data-toggle="tab" href="#nav-notes" role="tab"
                    aria-controls="nav-notes" aria-selected="false"
                    th:class="'nav-item nav-link '+ ${setTab == 'NoteTab' ? 'active' : ''}">Notes</a>
@@ -31,7 +33,7 @@
         </nav>
         <div class="tab-content" id="nav-tabContent">
             <div id="nav-files" role="tabpanel" aria-labelledby="nav-files-tab"
-                 th:class="'tab-pane fade '+ ${(setTab == 'FileTab' || setTab == null) ? 'show active' : ''}">
+                 th:class="'tab-pane fade '+ ${(setTab == 'FileTab' || setTab == '') ? 'show active' : ''}">
                 <form action="#" enctype="multipart/form-data" method="POST" th:object="${fileForm}" th:action="@{/fileUpload}">
                     <div class="container">
                         <div class="row" style="margin: 1em;">
@@ -158,12 +160,8 @@
                                 <button type="button" class="btn btn-success"
                                         th:attr="onclick=|showCredentialModal('${credential.credentialid}',
                                         '${credential.url}', '${credential.username}',
-                                        '${@encryptionService.decryptValue(credential.password, credential.key)}')|"
-                                >
-                                    <h2 th:text="${credential.key}"></h2>
-<!--                                    <a th:href="@{/decryptPassword/{id}(id=${credential.credentialid})}">-->
-                                    Edit
-<!--                                    </a>-->
+                                        '${encryptionService.decryptValue(credential.password, credential.key)}')|"
+                                >Edit
                                 </button>
                                 <a class="btn btn-danger"
                                    th:href="@{/deleteCredential/{id}(id=${credential.credentialid})}">Delete</a>
