@@ -19,23 +19,23 @@ public class NoteService{
         System.out.println("constructing note service bean");
     }
 
-    public List<Note> getAllNotes(){
-        return noteMapper.getAllNotes();
+    public List<Note> getAllNotes(Integer userid){
+        return noteMapper.getAllNotes(userid);
     }
 
     public void insertNote(Note note){
         noteMapper.insertNote(new Note(null, note.getNotetitle(), note.getNotedescription(), note.getUserid()));
     }
 
-    public void deleteNote(long noteid){
-        noteMapper.deleteNote(noteid);
+    public void deleteNote(long noteid, Integer userid){
+        noteMapper.deleteNote(noteid, userid);
     }
 
     public Note getNoteById(long noteid){
         return noteMapper.getNoteById(noteid);
     }
 
-    public void updateNote(Note note){
-        noteMapper.updateNote(note);
+    public void updateNote(Note note, Integer userid){
+        noteMapper.updateNote(note, userid);
     }
 }

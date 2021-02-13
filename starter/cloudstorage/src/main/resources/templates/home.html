@@ -11,7 +11,7 @@
 <body class="p-3 mb-2 bg-light text-black">
 <div class="container">
     <div id="logoutDiv">
-        <form action="#" method="POST">
+        <form action="#" method="POST" th:action="@{/logout}">
             <button type="submit" class="btn btn-secondary float-right">Logout</button>
         </form>
     </div>
@@ -44,7 +44,7 @@
                                 <input type="file" class="form-control-file" id="fileUpload" name="fileUpload">
                             </div>
                             <div class="col-sm-4">
-                                <button type="submit" class="btn btn-dark">Upload</button>
+                                <button type="submit" id="upload-button" class="btn btn-dark">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
             </div>
             <div id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab"
                  th:class="'tab-pane fade '+ ${setTab == 'NoteTab' ? 'show active' : ''}">
-                <button style="margin: 0.25em;" type="button" class="btn btn-info float-right"
+                <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" id="add-new-note"
                         onclick="showNoteModal()">
                     + Add a New Note
                 </button>
@@ -128,7 +128,8 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" onclick="$('#noteSubmit').click();">
+                                    <button type="submit" class="btn btn-primary" id="save-note"
+                                            onclick="$('#noteSubmit').click();">
                                         Save changes
                                     </button>
                                 </div>

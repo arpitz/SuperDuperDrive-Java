@@ -19,8 +19,8 @@ public class CredentialService {
         this.encryptionService = encryptionService;
     }
 
-    public List<Credential> getAllCredentials(){
-        return credentialMapper.getAllCredentials();
+    public List<Credential> getAllCredentials(Integer userid){
+        return credentialMapper.getAllCredentials(userid);
     }
 
     public void insertCredential(Credential credential) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -35,17 +35,17 @@ public class CredentialService {
                 encryptedPassword,credential.getUserid()));
     }
 
-    public void deleteCredential(long credentialid){
-        credentialMapper.deleteCredential(credentialid);
+    public void deleteCredential(long credentialid, Integer userid){
+        credentialMapper.deleteCredential(credentialid, userid);
     }
 
-    public void updateCredential(Credential cred){
+    public void updateCredential(Credential cred, Integer userid){
         Credential credential = getCredential(cred.getCredentialid());
         String encryptedPassword = encryptionService.encryptValue(cred.getPassword(), credential.getKey());
 
         credentialMapper.updateCredential(new Credential(credential.getCredentialid(),
                 credential.getUrl(), credential.getUsername(), credential.getKey(),
-                encryptedPassword,credential.getUserid()));
+                encryptedPassword, credential.getUserid()), userid);
     }
 
     public Credential getCredential(long credentialid){

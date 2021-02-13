@@ -14,8 +14,8 @@ public class FileService {
         this.fileMapper = fileMapper;
     }
 
-    public List<File> getAllFiles(){
-        return fileMapper.getAllFiles();
+    public List<File> getAllFiles(Integer userid){
+        return fileMapper.getAllFiles(userid);
     }
 
     public void insertFile(File file){
@@ -23,8 +23,8 @@ public class FileService {
                 file.getFilesize(), file.getUserid(),file.getFiledata()));
     }
 
-    public void deleteFile(long fileId){
-        fileMapper.deleteFile(fileId);
+    public void deleteFile(long fileId, Integer userid){
+        fileMapper.deleteFile(fileId, userid);
     }
 
     public File getFileById(long fileid){
