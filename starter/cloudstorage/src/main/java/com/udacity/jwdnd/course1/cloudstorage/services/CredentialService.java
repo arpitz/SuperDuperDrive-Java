@@ -44,7 +44,7 @@ public class CredentialService {
         String encryptedPassword = encryptionService.encryptValue(cred.getPassword(), credential.getKey());
 
         credentialMapper.updateCredential(new Credential(credential.getCredentialid(),
-                credential.getUrl(), credential.getUsername(), credential.getKey(),
+                cred.getUrl(), cred.getUsername(), credential.getKey(),
                 encryptedPassword, credential.getUserid()), userid);
     }
 

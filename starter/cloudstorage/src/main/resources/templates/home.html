@@ -140,7 +140,7 @@
             </div>
             <div id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab"
                  th:class="'tab-pane fade '+ ${setTab == 'CredentialTab' ? 'show active' : ''}">
-                <button style="margin: 0.25em;" type="button" class="btn btn-info float-right"
+                <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" id="add-new-credential"
                         onclick="showCredentialModal()">
                     + Add a New Credential
                 </button>
@@ -156,21 +156,21 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="credential: ${credentials}">
-                            <td>
-                                <button type="button" class="btn btn-success"
-                                        th:attr="onclick=|showCredentialModal('${credential.credentialid}',
-                                        '${credential.url}', '${credential.username}',
-                                        '${encryptionService.decryptValue(credential.password, credential.key)}')|"
-                                >Edit
-                                </button>
-                                <a class="btn btn-danger"
-                                   th:href="@{/deleteCredential/{id}(id=${credential.credentialid})}">Delete</a>
-                            </td>
-                            <th scope="row" th:text="${credential.url}">Example Credential URL</th>
-                            <td th:text="${credential.username}">Example Credential Username</td>
-                            <td th:text="${credential.password}">Example Credential Password</td>
-                        </tr>
+                            <tr th:each="credential: ${credentials}">
+                                <td>
+                                    <button type="button" class="btn btn-success"
+                                            th:attr="onclick=|showCredentialModal('${credential.credentialid}',
+                                            '${credential.url}', '${credential.username}',
+                                            '${encryptionService.decryptValue(credential.password, credential.key)}')|"
+                                    >Edit
+                                    </button>
+                                    <a class="btn btn-danger"
+                                       th:href="@{/deleteCredential/{id}(id=${credential.credentialid})}">Delete</a>
+                                </td>
+                                <th scope="row" th:text="${credential.url}">Example Credential URL</th>
+                                <td th:text="${credential.username}">Example Credential Username</td>
+                                <td th:text="${credential.password}">Example Credential Password</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -208,7 +208,8 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" onclick="$('#credentialSubmit').click();">
+                                <button type="submit" class="btn btn-primary"
+                                        id="save-credential" onclick="$('#credentialSubmit').click();">
                                     Save changes
                                 </button>
                             </div>

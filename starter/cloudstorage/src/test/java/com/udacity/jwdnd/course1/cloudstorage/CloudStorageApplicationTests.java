@@ -74,55 +74,144 @@ class CloudStorageApplicationTests {
 	@Test
 	public void testNoteCreationAndDisplay(){
 		testUserSignupLoginAndHomepage();
-		WebElement notesTab = driver.findElement(By.id("nav-notes-tab"));
-		notesTab.click();
 
+		WebDriverWait wait = new WebDriverWait(driver, 50);
+		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-notes-tab")));
+
+		element.click();
 		List<WebElement> tableRows = driver.findElement(By.id("userTable")).
 				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
 		assertEquals(0, tableRows.size());
-
-		WebDriverWait wait = new WebDriverWait(driver, 10);
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-new-note")));
-
+		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-new-note")));
 		WebElement addNewNoteButton = driver.findElement(By.id("add-new-note"));
 		addNewNoteButton.click();
-
 		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("note-title")));
 
 		String title = "title1";
 		String description = "description1";
 		NotePage notePage = new NotePage(driver);
 		notePage.addNote(title, description);
-
 		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
-
 		tableRows = driver.findElement(By.id("userTable")).
 				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
 		assertEquals(1, tableRows.size());
 	}
 
+	@Test
 	public void testNoteDeletionAndDisplay(){
+		testNoteCreationAndDisplay();
+		WebDriverWait wait = new WebDriverWait(driver, 50);
+		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.btn-danger")));
 
+		element.click();
+		List<WebElement> tableRows = driver.findElement(By.id("userTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+		assertEquals(0, tableRows.size());
 	}
 
+	@Test
 	public void testNoteEditAndDisplay(){
+		testNoteCreationAndDisplay();
+		WebDriverWait wait = new WebDriverWait(driver, 50);
+		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
+
+		//Edit click
+		element.click();
+
+		//Save edited note
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("note-title")));
+
+		String title = "title-new";
+		String description = "description-new";
+		NotePage notePage = new NotePage(driver);
+		notePage.addNote(title, description);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
+
+		// Check new table data
+		List<WebElement> tableRows = driver.findElement(By.id("userTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("th"));
+		assertEquals(true, tableRows.get(0).getText().contains(title));
+
+		tableRows = driver.findElement(By.id("userTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("td"));
+		assertEquals(true, tableRows.get(1).getText().contains(description));
 
 	}
 
-	public void testCredentialCreationAndDisplay(){
+	@Test
+	public void testCredentialCreationWithEncryptPassword(){
+		testUserSignupLoginAndHomepage();
+
+		WebDriverWait wait = new WebDriverWait(driver, 50);
+		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-credentials-tab")));
+
+		element.click();
+		List<WebElement> tableRows = driver.findElement(By.id("credentialTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+		assertEquals(0, tableRows.size());
+		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("add-new-credential")));
+		element.click();
+
+		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credential-url")));
+
+		String url = "google.com";
+		String username = "arpit";
+		String password = "arpit123";
+		CredentialPage credentialPage = new CredentialPage(driver);
+		credentialPage.addCredential(url, username, password);
+		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
+		tableRows = driver.findElement(By.id("credentialTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+		assertEquals(1, tableRows.size());
+
+
+		List<WebElement> tabledata = driver.findElement(By.id("credentialTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("td"));
+		assertEquals(false, tabledata.get(2).getText().equals(password));
+	}
+
+	@Test
+	public void testCredentialEditWithDecryptPassword(){
+		testCredentialCreationWithEncryptPassword();
+
+		// click on edit
+		WebDriverWait wait = new WebDriverWait(driver, 50);
+		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
+
+		element.click();
+
+		// checks that the password on edit is decrypted back
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("credential-password")));
+		assertEquals("arpit123", driver.findElement(By.id("credential-password")).getAttribute("value"));
+
+		// edit new values
+		String url = "yahoo.com";
+		String username = "new-user";
+		String password = "newpassword";
+		CredentialPage credentialPage = new CredentialPage(driver);
+		credentialPage.addCredential(url, username, password);
+		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
+		List<WebElement> tableRows = driver.findElement(By.id("credentialTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+		assertEquals(1, tableRows.size());
+
+		List<WebElement> tabledata = driver.findElement(By.id("credentialTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("td"));
+		assertEquals(true, tabledata.get(1).getText().contains(username));
 
 	}
 
-	public void testCredCreateWithEncryptedPassword(){
+	@Test
+	public void  testCredentialDeletionAndDisplay(){
+		testCredentialCreationWithEncryptPassword();
+		// click on delete
+		WebDriverWait wait = new WebDriverWait(driver, 50);
+		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.btn-danger")));
 
-	}
-
-	public void testCredentialDeletionAndDisplay(){
-
-	}
-
-	public void testCredentialEditAndDisplayDecryptPassword(){
-
+		element.click();
+		List<WebElement> tableRows = driver.findElement(By.id("credentialTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+		assertEquals(0, tableRows.size());
 	}
 
 }
