@@ -15,6 +15,7 @@ import java.security.Principal;
 @RequestMapping()
 public class NoteController {
 
+    private static final int DESCRIPTION_LIMIT = 150;
     private NoteService noteService;
     private UserService userService;
 
@@ -28,12 +29,29 @@ public class NoteController {
                            RedirectAttributes redirectAttributes, Principal principal){
         User user = userService.getUser(principal.getName());
         Integer userid = user.getUserid();
+
+        // Check the description size
+        if(noteForm.getNotedescription().length() > DESCRIPTION_LIMIT){
+            redirectAttributes.addFlashAttribute("descLimitError", "descLimitError");
+            redirectAttributes.addFlashAttribute("setTab", "NoteTab");
+            return "redirect:/home";
+        }
         // If a note exists with that id, update it
         if(noteForm.getNoteid() != null){
-            noteService.updateNote(noteForm, userid);
+            try{
+                noteService.updateNote(noteForm, userid);
+                redirectAttributes.addFlashAttribute("noteEditSuccess", "noteEditSuccess");
+            } catch (Exception e){
+                redirectAttributes.addFlashAttribute("noteEditFailure", "noteEditFailure");
+            }
         } else {
             noteForm.setUserid(userid);
-            noteService.insertNote(noteForm);
+            try{
+                noteService.insertNote(noteForm);
+                redirectAttributes.addFlashAttribute("noteSuccess", "noteSuccess");
+            } catch (Exception e){
+                redirectAttributes.addFlashAttribute("noteFailure", "noteFailure");
+            }
         }
 
         model.addAttribute("notes", noteService.getAllNotes(userid));

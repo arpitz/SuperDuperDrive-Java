@@ -34,6 +34,20 @@ public class HomeController {
                            @ModelAttribute("credentialForm") Credential credentialForm,
                            @ModelAttribute("fileForm") Note fileForm,
                            @ModelAttribute("setTab") String setTab,
+                           @ModelAttribute("descLimitError") String descLimitError,
+                           @ModelAttribute("emptyFile") String emptyFile,
+                           @ModelAttribute("fileSizeLimit") String fileSizeLimit,
+                           @ModelAttribute("duplicateFile") String duplicateFile,
+                           @ModelAttribute("uploadSuccess") String uploadSuccess,
+                           @ModelAttribute("uploadFailure") String uploadFailure,
+                           @ModelAttribute("noteSuccess") String noteSuccess,
+                           @ModelAttribute("noteFailure") String noteFailure,
+                           @ModelAttribute("noteEditSuccess") String noteEditSuccess,
+                           @ModelAttribute("noteEditFailure") String noteEditFailure,
+                           @ModelAttribute("credentialSuccess") String credentialSuccess,
+                           @ModelAttribute("credentialFailure") String credentialFailure,
+                           @ModelAttribute("credEditSuccess") String credEditSuccess,
+                           @ModelAttribute("credEditFailure") String credEditFailure,
                            Model model,
                            Principal principal){
         User user = userService.getUser(principal.getName());
@@ -44,6 +58,20 @@ public class HomeController {
         model.addAttribute("files", fileService.getAllFiles(userid));
         model.addAttribute("encryptionService", encryptionService);
         model.addAttribute("setTab", setTab);
+        model.addAttribute("descLimitError", descLimitError);
+        model.addAttribute("emptyFile", emptyFile);
+        model.addAttribute("fileSizeLimit", fileSizeLimit);
+        model.addAttribute("duplicateFile", duplicateFile);
+        model.addAttribute("uploadSuccess", uploadSuccess);
+        model.addAttribute("uploadFailure", uploadFailure);
+        model.addAttribute("noteSuccess", noteSuccess);
+        model.addAttribute("noteFailure", noteFailure);
+        model.addAttribute("noteEditSuccess", noteEditSuccess);
+        model.addAttribute("noteEditFailure", noteEditFailure);
+        model.addAttribute("credentialSuccess", credentialSuccess);
+        model.addAttribute("credentialFailure", credentialFailure);
+        model.addAttribute("credEditSuccess", credEditSuccess);
+        model.addAttribute("credEditFailure", credEditFailure);
         return "home";
     }
 }

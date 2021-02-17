@@ -37,10 +37,20 @@ public class CredentialController {
 
         // If a credential exists with that id, update it
         if(credentialForm.getCredentialid() != null){
-            credentialService.updateCredential(credentialForm, userid);
+            try{
+                credentialService.updateCredential(credentialForm, userid);
+                redirectAttributes.addFlashAttribute("credEditSuccess", "credEditSuccess");
+            } catch (Exception e){
+                redirectAttributes.addFlashAttribute("credEditFailure", "credEditFailure");
+            }
         } else {
             credentialForm.setUserid(userid);
-            credentialService.insertCredential(credentialForm);
+            try{
+                credentialService.insertCredential(credentialForm);
+                redirectAttributes.addFlashAttribute("credentialSuccess", "credentialSuccess");
+            } catch (Exception e){
+                redirectAttributes.addFlashAttribute("credentialFailure", "credentialFailure");
+            }
         }
         model.addAttribute("credentials", credentialService.getAllCredentials(userid));
         redirectAttributes.addFlashAttribute("setTab", "CredentialTab");

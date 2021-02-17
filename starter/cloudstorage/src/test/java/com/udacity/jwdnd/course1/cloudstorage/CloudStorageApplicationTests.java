@@ -11,12 +11,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
+
+import javax.annotation.Priority;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CloudStorageApplicationTests {
 	@LocalServerPort
 	public int port;
@@ -36,23 +39,11 @@ class CloudStorageApplicationTests {
 	public void beforeEach() {
 		baseURL = baseURL = "http://localhost:" + port;
 	}
-	@Test
-	public void testUserSignupLoginAndHomepage() {
-		String username = "aaa";
-		String password = "a123";
-		driver.get(baseURL + "/signup");
-		SignupPage signupPage = new SignupPage(driver);
-		signupPage.signup("Arpit", "Trivedi", username, password);
-		driver.get(baseURL + "/login");
-		LoginPage loginPage = new LoginPage(driver);
-		loginPage.login(username, password);
-		WebElement fileElement = driver.findElement(By.id("nav-files"));
-		assertEquals(true, fileElement.isDisplayed());
-	}
 
 	@Test
+	@Order(1)
 	public void testUnauthorizedAccess(){
-		// Without signing up, user willbe redirected to login
+		// Without signing up, user will be redirected to login
 		driver.get(baseURL + "/home");
 		String url = driver.getCurrentUrl();
 		assertEquals(true, url.equals(baseURL + "/login"));
@@ -60,8 +51,25 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
+	@Order(2)
+	public void testUserSignupLoginAndHomepage() {
+		String username = "aaa";
+		String password = "a123";
+		driver.get(baseURL + "/signup");
+		SignupPage signupPage = new SignupPage(driver);
+		signupPage.signup("Arpit", "Trivedi", username, password);
+
+		driver.get(baseURL + "/login");
+		LoginPage loginPage = new LoginPage(driver);
+		loginPage.login(username, password);
+
+		WebElement fileElement = driver.findElement(By.id("nav-files"));
+		assertEquals(true, fileElement.isDisplayed());
+	}
+
+	@Test
+	@Order(3)
 	public void testAccessAfterLogout(){
-		// the home should not be accessible after logout
 		testUserSignupLoginAndHomepage();
 
 		WebDriverWait wait = new WebDriverWait(driver, 50);
@@ -72,8 +80,10 @@ class CloudStorageApplicationTests {
 		String url = driver.getCurrentUrl();
 		assertEquals(true, url.equals(baseURL + "/login"));
 		testUnauthorizedAccess();
-	}
+ }
+
 	@Test
+	@Order(4)
 	public void testNoteCreationAndDisplay(){
 		testUserSignupLoginAndHomepage();
 
@@ -96,17 +106,9 @@ class CloudStorageApplicationTests {
 				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
 		assertEquals(1, tableRows.size());
 	}
+
 	@Test
-	public void testNoteDeletionAndDisplay(){
-		testNoteCreationAndDisplay();
-		WebDriverWait wait = new WebDriverWait(driver, 50);
-		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.btn-danger")));
-		((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-		List<WebElement> tableRows = driver.findElement(By.id("userTable")).
-				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
-		assertEquals(0, tableRows.size());
-	}
-	@Test
+	@Order(5)
 	public void testNoteEditAndDisplay(){
 		testNoteCreationAndDisplay();
 		WebDriverWait wait = new WebDriverWait(driver, 50);
@@ -128,7 +130,21 @@ class CloudStorageApplicationTests {
 				findElement(By.tagName("tbody")).findElements(By.tagName("td"));
 		assertEquals(true, tableRows.get(1).getText().contains(description));
 	}
+
 	@Test
+	@Order(6)
+	public void testNoteDeletionAndDisplay(){
+		testNoteCreationAndDisplay();
+		WebDriverWait wait = new WebDriverWait(driver, 50);
+		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.btn-danger")));
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+		List<WebElement> tableRows = driver.findElement(By.id("userTable")).
+				findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+		assertEquals(0, tableRows.size());
+	}
+
+	@Test
+	@Order(7)
 	public void testCredentialCreationWithEncryptPassword(){
 		testUserSignupLoginAndHomepage();
 		WebDriverWait wait = new WebDriverWait(driver, 50);
@@ -153,7 +169,9 @@ class CloudStorageApplicationTests {
 				findElement(By.tagName("tbody")).findElements(By.tagName("td"));
 		assertEquals(false, tabledata.get(2).getText().equals(password));
 	}
+
 	@Test
+	@Order(8)
 	public void testCredentialEditWithDecryptPassword(){
 		testCredentialCreationWithEncryptPassword();
 		// click on edit
@@ -177,8 +195,10 @@ class CloudStorageApplicationTests {
 				findElement(By.tagName("tbody")).findElements(By.tagName("td"));
 		assertEquals(true, tabledata.get(1).getText().contains(username));
 	}
+
 	@Test
-	public void  testCredentialDeletionAndDisplay(){
+	@Order(9)
+	public void testCredentialDeletionAndDisplay(){
 		testCredentialCreationWithEncryptPassword();
 		// click on delete
 		WebDriverWait wait = new WebDriverWait(driver, 50);

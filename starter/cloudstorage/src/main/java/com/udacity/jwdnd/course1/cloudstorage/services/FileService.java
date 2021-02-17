@@ -30,4 +30,8 @@ public class FileService {
     public File getFileById(long fileid){
         return fileMapper.getFileById(fileid);
     }
+
+    public File getFileByName(String filename, Integer userid){
+        return fileMapper.getFileByName(filename, userid);
+    }
 }

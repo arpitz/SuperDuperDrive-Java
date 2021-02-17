@@ -36,6 +36,23 @@
                  th:class="'tab-pane fade '+ ${(setTab == 'FileTab' || setTab == '') ? 'show active' : ''}">
                 <form action="#" enctype="multipart/form-data" method="POST" th:object="${fileForm}" th:action="@{/fileUpload}">
                     <div class="container">
+                        <div class=" row">
+                            <div class="col-sm-12 alert alert-danger" th:if="${emptyFile == 'emptyFile'}">
+                                <span>Empty file cannot be uploaded ! Please select a file to upload.</span>
+                            </div>
+                            <div class="col-sm-12 alert alert-danger" th:if="${fileSizeLimit == 'fileSizeLimit'}">
+                                <span>The file could not be uploaded as the file size exceeded the limit!</span>
+                            </div>
+                            <div class="col-sm-12 alert alert-danger" th:if="${duplicateFile == 'duplicateFile'}">
+                                <span>Duplicate file upload is not allowed for the same user!</span>
+                            </div>
+                            <div class="col-sm-12 alert alert-success" th:if="${uploadSuccess == 'uploadSuccess'}">
+                                <span>File is uploaded successfully!</span>
+                            </div>
+                            <div class="col-sm-12 alert alert-danger" th:if="${uploadFailure == 'uploadFailure'}">
+                                <span>File upload encountered some problems!</span>
+                            </div>
+                        </div>
                         <div class="row" style="margin: 1em;">
                             <div class="col-sm-2">
                                 <label for="fileUpload">Upload a New File:</label>
@@ -71,37 +88,56 @@
             </div>
             <div id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab"
                  th:class="'tab-pane fade '+ ${setTab == 'NoteTab' ? 'show active' : ''}">
-                <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" id="add-new-note"
-                        onclick="showNoteModal()">
-                    + Add a New Note
-                </button>
-
-                <div class="table-responsive">
-                    <table class="table table-striped" id="userTable">
-                        <thead>
-                        <tr>
-                            <th style="width: 20%" scope="col"></th>
-                            <th style="width: 20%" scope="col">Title</th>
-                            <th style="width: 60%" scope="col">Description</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="note: ${notes}">
-                            <td>
-                                <button type="button" class="btn btn-success"
-                                        th:attr="onclick=|showNoteModal('${note.noteid}', '${note.notetitle}', '${note.notedescription}')|" >
-                                    Edit
-                                </button>
-                                <a class="btn btn-danger" th:href="@{/deleteNote/{id}(id=${note.noteid})}">Delete</a>
-                            </td>
-                            <th scope="row" th:text="${note.notetitle}">Example Note Title</th>
-                            <td th:text="${note.notedescription}">Example Note Description</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div style="margin-left: 85%;">
+                    <button style="margin: 0.25em;" type="button" class="btn btn-info" id="add-new-note"
+                            onclick="showNoteModal()">
+                        + Add a New Note
+                    </button>
                 </div>
-
                 <form action="#" method="POST" th:object="${noteForm}" th:action="@{/note}">
+                    <div>
+                        <div class="alert alert-danger my-2"
+                             th:if="${descLimitError == 'descLimitError'}">
+                            <span>The note cannot be saved as the description size exceeds the limit.</span>
+                        </div>
+                        <div class="alert alert-success my-2" th:if="${noteSuccess == 'noteSuccess'}">
+                            <span>Note is added successfully!</span>
+                        </div>
+                        <div class="alert alert-danger my-2" th:if="${noteFailure == 'noteFailure'}">
+                            <span>Note addition encountered some problems!</span>
+                        </div>
+                        <div class="alert alert-success my-2" th:if="${noteEditSuccess == 'noteEditSuccess'}">
+                            <span>Note is edited successfully!</span>
+                        </div>
+                        <div class="alert alert-danger my-2" th:if="${noteEditFailure == 'noteEditFailure'}">
+                            <span>Editing Note encountered some problems!</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="userTable">
+                            <thead>
+                            <tr>
+                                <th style="width: 20%" scope="col"></th>
+                                <th style="width: 20%" scope="col">Title</th>
+                                <th style="width: 60%" scope="col">Description</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="note: ${notes}">
+                                <td>
+                                    <button type="button" class="btn btn-success"
+                                            th:attr="onclick=|showNoteModal('${note.noteid}', '${note.notetitle}', '${note.notedescription}')|" >
+                                        Edit
+                                    </button>
+                                    <a class="btn btn-danger" th:href="@{/deleteNote/{id}(id=${note.noteid})}">Delete</a>
+                                </td>
+                                <th scope="row" th:text="${note.notetitle}">Example Note Title</th>
+                                <td th:text="${note.notedescription}">Example Note Description</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="noteModalLabel"
                          aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -140,11 +176,27 @@
             </div>
             <div id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab"
                  th:class="'tab-pane fade '+ ${setTab == 'CredentialTab' ? 'show active' : ''}">
-                <button style="margin: 0.25em;" type="button" class="btn btn-info float-right" id="add-new-credential"
-                        onclick="showCredentialModal()">
-                    + Add a New Credential
-                </button>
-
+                <div style="margin-left: 85%;">
+                    <button style="margin: 0.25em;" type="button" class="btn btn-info" id="add-new-credential"
+                            onclick="showCredentialModal()">
+                        + Add a New Credential
+                    </button>
+                </div>
+                <form action="#" method="POST" th:object="${credentialForm}" th:action="@{/credential}">
+                    <div>
+                        <div class="alert alert-success my-2" th:if="${credentialSuccess == 'credentialSuccess'}">
+                            <span>Credential is added successfully!</span>
+                        </div>
+                        <div class="alert alert-danger my-2" th:if="${credentialFailure == 'credentialFailure'}">
+                            <span>Credential addition encountered some problems!</span>
+                        </div>
+                        <div class="alert alert-success my-2" th:if="${credEditSuccess == 'credEditSuccess'}">
+                            <span>Credential is edited successfully!</span>
+                        </div>
+                        <div class="alert alert-danger my-2" th:if="${credEditFailure == 'credEditFailure'}">
+                            <span>Editing credential encountered some problems!</span>
+                        </div>
+                    </div>
                 <div class="table-responsive">
                     <table class="table table-striped" id="credentialTable">
                         <thead>
@@ -175,7 +227,6 @@
                     </table>
                 </div>
 
-                <form action="#" method="POST" th:object="${credentialForm}" th:action="@{/credential}">
                 <div class="modal fade" id="credentialModal" tabindex="-1" role="dialog"
                      aria-labelledby="credentialModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
