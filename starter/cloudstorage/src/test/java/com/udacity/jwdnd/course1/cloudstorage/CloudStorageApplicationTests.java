@@ -18,13 +18,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CloudStorageApplicationTests {
 	@LocalServerPort
 	public int port;
 	public static WebDriver driver;
 	public String baseURL;
+
+	public String username = "aaa";
+	public String password = "a123";
+
 	@BeforeAll
 	public static void beforeAll() {
 		WebDriverManager.chromedriver().setup();
@@ -40,9 +43,28 @@ class CloudStorageApplicationTests {
 		baseURL = baseURL = "http://localhost:" + port;
 	}
 
-	@Test
-	@Order(1)
-	public void testUnauthorizedAccess(){
+	/**
+	 * Perform signup process
+	 */
+	public void signup(){
+		driver.get(baseURL + "/signup");
+		SignupPage signupPage = new SignupPage(driver);
+		signupPage.signup("Arpit", "Trivedi", username, password);
+	}
+
+	/**
+	 * Perform login process
+	 */
+	public void login(){
+		driver.get(baseURL + "/login");
+		LoginPage loginPage = new LoginPage(driver);
+		loginPage.login(username, password);
+	}
+
+	/**
+	 * Perform unauthorized check
+	 */
+	public void unauthorizedCheck(){
 		// Without signing up, user will be redirected to login
 		driver.get(baseURL + "/home");
 		String url = driver.getCurrentUrl();
@@ -51,17 +73,16 @@ class CloudStorageApplicationTests {
 	}
 
 	@Test
+	@Order(1)
+	public void testUnauthorizedAccess(){
+		unauthorizedCheck();
+	}
+
+	@Test
 	@Order(2)
 	public void testUserSignupLoginAndHomepage() {
-		String username = "aaa";
-		String password = "a123";
-		driver.get(baseURL + "/signup");
-		SignupPage signupPage = new SignupPage(driver);
-		signupPage.signup("Arpit", "Trivedi", username, password);
-
-		driver.get(baseURL + "/login");
-		LoginPage loginPage = new LoginPage(driver);
-		loginPage.login(username, password);
+		signup();
+		login();
 
 		WebElement fileElement = driver.findElement(By.id("nav-files"));
 		assertEquals(true, fileElement.isDisplayed());
@@ -70,7 +91,6 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(3)
 	public void testAccessAfterLogout(){
-		testUserSignupLoginAndHomepage();
 
 		WebDriverWait wait = new WebDriverWait(driver, 50);
 		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("logout-button")));
@@ -79,13 +99,13 @@ class CloudStorageApplicationTests {
 		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("login-title")));
 		String url = driver.getCurrentUrl();
 		assertEquals(true, url.equals(baseURL + "/login"));
-		testUnauthorizedAccess();
+		unauthorizedCheck();
  }
 
 	@Test
 	@Order(4)
 	public void testNoteCreationAndDisplay(){
-		testUserSignupLoginAndHomepage();
+		login();
 
 		WebDriverWait wait = new WebDriverWait(driver, 50);
 		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-notes-tab")));
@@ -110,7 +130,7 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(5)
 	public void testNoteEditAndDisplay(){
-		testNoteCreationAndDisplay();
+
 		WebDriverWait wait = new WebDriverWait(driver, 50);
 		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
 		//Edit click
@@ -134,7 +154,7 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(6)
 	public void testNoteDeletionAndDisplay(){
-		testNoteCreationAndDisplay();
+
 		WebDriverWait wait = new WebDriverWait(driver, 50);
 		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.btn-danger")));
 		((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
@@ -146,7 +166,7 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(7)
 	public void testCredentialCreationWithEncryptPassword(){
-		testUserSignupLoginAndHomepage();
+
 		WebDriverWait wait = new WebDriverWait(driver, 50);
 		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-credentials-tab")));
 		((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
@@ -173,7 +193,7 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(8)
 	public void testCredentialEditWithDecryptPassword(){
-		testCredentialCreationWithEncryptPassword();
+
 		// click on edit
 		WebDriverWait wait = new WebDriverWait(driver, 50);
 		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn-success")));
@@ -199,7 +219,7 @@ class CloudStorageApplicationTests {
 	@Test
 	@Order(9)
 	public void testCredentialDeletionAndDisplay(){
-		testCredentialCreationWithEncryptPassword();
+
 		// click on delete
 		WebDriverWait wait = new WebDriverWait(driver, 50);
 		WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.btn-danger")));

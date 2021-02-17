@@ -5,6 +5,11 @@ import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -65,31 +70,13 @@ public class FileController {
         return "redirect:/home";
     }
 
-    @GetMapping("/download/{id}")
-    public void downloadFile(HttpServletRequest request, HttpServletResponse response,
-                               @PathVariable("id") long id) throws IOException {
-        File file = fileService.getFileById(id);
-        java.io.File ioFile = new java.io.File(file.getFilename());
-//        java.io.File outputFile = new java.io.File(newFile.getFilename());
-//        FileUtils.writeByteArrayToFile(outputFile, newFile.getFiledata());
-//        redirectAttributes.addFlashAttribute("setTab", "FileTab");
-//        return "redirect:/home";
-        if (file != null) {
-            //get the mimetype
-            String mimeType = URLConnection.guessContentTypeFromName(file.getFilename());
-            if (mimeType == null) {
-                //unknown mimetype so set the mimetype to application/octet-stream
-                mimeType = "application/octet-stream";
-            }
-
-            response.setContentType(mimeType);
-            //response.setHeader("Content-Disposition", String.format("inline; filename=\"" + file.getFilename() + "\""));
-            response.setHeader("Content-Disposition", String.format("attachment; filename=\"" + file.getFilename() + "\""));
-            response.setContentLength(Integer.parseInt(file.getFilesize()));
-
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(ioFile));
-            FileCopyUtils.copy(inputStream, response.getOutputStream());
-        }
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") Integer fileId){
+        File file = fileService.getFileById(fileId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(  file.getContenttype() ))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(new ByteArrayResource(file.getFiledata()));
     }
 
     @GetMapping("/deleteFile/{id}")
