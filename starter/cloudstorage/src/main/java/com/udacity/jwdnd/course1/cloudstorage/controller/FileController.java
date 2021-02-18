@@ -5,6 +5,7 @@ import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
 import org.apache.commons.io.FileUtils;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -95,10 +96,13 @@ public class FileController {
         if(file.getOriginalFilename().isEmpty()){
             return "emptyFile";
         }
+
         Long max_file_size = Math.round(Math.ceil((float)file.getSize()/1000));
-        if(max_file_size > 128){
+        // If file size is greater than 1000 KB i.e. 1 MB
+        if(max_file_size > 1000) {
             return "fileSizeLimit";
         }
+
         File f = fileService.getFileByName(file.getOriginalFilename(), userid);
         if(f != null){
             return "duplicateFile";
